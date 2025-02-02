@@ -26,7 +26,7 @@
                                 <label for="name"
                                     class="text-sm sm:text-md font-bold text-gray-800 dark:text-black">Nombre del
                                     proyecto</label>
-                                <input type="text" name="name_project" value="{{ old('name_project') }}"
+                                <input required type="text" name="name_project" value="{{ old('name_project') }}"
                                     class="block w-full border border-emerald-500 outline-emerald-800 px-2 py-2 text-sm sm:text-md rounded-md my-2 bg-white dark:bg-white text-gray-900 dark:text-black"
                                     id="name">
                             </div>
@@ -35,7 +35,7 @@
                             <div class="my-2">
                                 <label for="first_name"
                                     class="text-sm sm:text-md font-bold text-gray-700 dark:text-black">Descripción</label>
-                                <input type="text" name="description" value="{{ old('description') }}"
+                                <input required type="text" name="description" value="{{ old('description') }}"
                                     class="block w-full border border-emerald-500 outline-emerald-800 px-2 py-2 text-sm sm:text-md rounded-md my-2 bg-white dark:bg-white text-gray-900 dark:text-black"
                                     id="first_name">
                             </div>
@@ -44,7 +44,7 @@
                             <div class="my-2">
                                 <label for="fileInput"
                                     class="text-sm sm:text-md font-bold text-gray-700 dark:text-black">Archivos</label>
-                                <input type="file" name="files[]" value="{{ old('file') }}" multiple id="fileInput"
+                                <input required type="file" name="files[]" value="{{ old('file') }}" multiple id="fileInput"
                                     class="block w-full border border-emerald-500 outline-emerald-800 px-2 py-2 text-sm sm:text-md rounded-md my-2 bg-white dark:bg-white text-gray-900 dark:text-black">
                                 <div id="filePreview"></div>
                             </div>

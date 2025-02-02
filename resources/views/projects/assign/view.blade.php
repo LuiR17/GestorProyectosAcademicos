@@ -31,17 +31,18 @@
                         </div>
 
                         <div class="my-2">
-                            <label for="Participantes"
-                                class="text-sm sm:text-md font-bold text-gray-800 dark:text-black">Añadir
-                                participantes</label>
-                            <select
-                                class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
-                                id="role" name="user_id" required>
+                            <label for="Participantes" class="text-sm sm:text-md font-bold text-gray-800 dark:text-black">Añadir participantes</label>
+                            <select class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" id="role" name="user_id" required>
                                 @foreach ($users as $user)
-                                    <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                    @if ($user->id !== auth()->id()) <!-- Excluir al usuario logueado -->
+                                        <option value="{{ $user->id }}">
+                                            {{ $user->name }} ({{ $user->role->name ?? 'Sin rol' }}) <!-- Mostrar el nombre del rol -->
+                                        </option>
+                                    @endif
                                 @endforeach
                             </select>
                         </div>
+                        
 
                         <!-- Save button -->
                         <button type="submit"

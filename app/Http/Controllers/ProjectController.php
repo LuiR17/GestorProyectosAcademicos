@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Models\User;
+use Illuminate\Validation\Rules;
 
 class ProjectController extends Controller
 {
@@ -48,6 +49,11 @@ class ProjectController extends Controller
      */
     public function store(Request $request)
     {
+        $request->validate([
+            'name_project' => 'required',
+            'description' => 'required',
+            'files.*' => 'mimes:pdf,docx,doc|max:2048' // Validar que los archivos sean PDF o DOCX y que no excedan 2MB
+        ]);
         // Validar que se han subido archivos
         if ($request->hasFile('files')) {
             $fileNames = [];
