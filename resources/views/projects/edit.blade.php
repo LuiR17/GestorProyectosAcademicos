@@ -17,14 +17,16 @@
                         <!-- Form title -->
                         <h1 class="text-center text-2xl sm:text-3xl font-bold text-black dark:text-black">Editar Proyecto
                         </h1>
-                        <form action="{{route('projects.update', $project->id)}}" method="POST">
+                        <form action="{{ route('projects.update', $project->id) }}" method="POST"
+                            enctype="multipart/form-data">
                             @csrf @method('PATCH')
                             <!-- Input field for 'Name' -->
                             <div class="my-2">
                                 <label for="name"
                                     class="text-sm sm:text-md font-bold text-gray-800 dark:text-black">Nombre del
                                     proyecto</label>
-                                <input type="text" name="name_project" value="{{ old('name_project', $project->name_project) }}"
+                                <input type="text" name="name_project"
+                                    value="{{ old('name_project', $project->name_project) }}"
                                     class="block w-full border border-emerald-500 outline-emerald-800 px-2 py-2 text-sm sm:text-md rounded-md my-2 bg-white dark:bg-white text-gray-900 dark:text-black"
                                     id="name">
                             </div>
@@ -33,18 +35,33 @@
                             <div class="my-2">
                                 <label for="first_name"
                                     class="text-sm sm:text-md font-bold text-gray-700 dark:text-black">Descripción</label>
-                                <input type="text" name="description" value="{{ old('description', $project->description) }}"
+                                <input type="text" name="description"
+                                    value="{{ old('description', $project->description) }}"
                                     class="block w-full border border-emerald-500 outline-emerald-800 px-2 py-2 text-sm sm:text-md rounded-md my-2 bg-white dark:bg-white text-gray-900 dark:text-black"
                                     id="first_name">
                             </div>
 
                             <!-- Input field for 'Class' -->
                             <div class="my-2">
-                                <label for="class"
+                                <label for="fileInput"
                                     class="text-sm sm:text-md font-bold text-gray-700 dark:text-black">Archivos</label>
-                                <input type="file" name="file" value="{{ old('file', $project->file) }}"
-                                    class="block w-full border border-emerald-500 outline-emerald-800 px-2 py-2 text-sm sm:text-md rounded-md my-2 bg-white dark:bg-white text-gray-900 dark:text-black"
-                                    id="class">
+                                <!-- Mostrar los archivos previamente cargados -->
+                                @if ($project->file)
+                                    <div class="my-2">
+                                        <h3 class="text-md font-bold">Archivos actuales:</h3>
+                                        @foreach (json_decode($project->file, true) as $file)
+                                            <p>
+                                                <a href="{{ asset('storage/' . $file) }}" target="_blank"
+                                                    class="text-blue-500">{{ basename($file) }}</a>
+                                            </p>
+                                        @endforeach
+                                    </div>
+                                @endif
+
+                                <!-- Input de archivos nuevos -->
+                                <input type="file" name="files[]" value="{{ old('file') }}" multiple id="fileInput"
+                                    class="block w-full border border-emerald-500 outline-emerald-800 px-2 py-2 text-sm sm:text-md rounded-md my-2 bg-white dark:bg-white text-gray-900 dark:text-black">
+                                <div id="filePreview"></div>
                             </div>
 
                             <!-- Save button -->
@@ -62,4 +79,4 @@
 
         </div>
     </div>
-</x-app-layout>	
+</x-app-layout>

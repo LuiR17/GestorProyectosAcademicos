@@ -103,21 +103,47 @@ class ProjectController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $project = Project::find($id);
-        $project->name_project = $request->input('name_project');
-        $project->description = $request->input('description');
-        $project->file = $request->input('file');
-        //$project->user_id = Auth::user()->id;
-        $project->save();
+        // Buscar el proyecto
+        $project = Project::findOrFail($id);
 
-        if (Auth::id() !== $project->user_id && !$project->users->contains(Auth::id())) {
-            return redirect()->route('dashboard')->with('error', 'No tienes permiso para editar este proyecto.');
+        // Verificar si se han subido nuevos archivos
+        if ($request->hasFile('files')) {
+            $fileNames = [];
+            $originalNames = [];
+
+            // Procesar cada archivo cargado
+            foreach ($request->file('files') as $file) {
+                // Generar un nombre único para el archivo
+                $filePath = $file->store('projects', 'public');
+                $fileNames[] = $filePath;
+                $originalNames[] = $file->getClientOriginalName();
+            }
+
+            // Actualizar los campos de los archivos en la base de datos
+            $project->file = json_encode($fileNames); // Guardar las rutas de los archivos
+            $project->original_file_name = json_encode($originalNames); // Guardar los nombres originales
+        } else {
+            // Si no se suben nuevos archivos, mantener los archivos existentes
+            // Mantener los archivos previos
+            $fileNames = json_decode($project->file, true);
+            $originalNames = json_decode($project->original_file_name, true);
+
+            // No se cambia nada de los archivos si no se suben nuevos
+            $project->file = json_encode($fileNames); // Rutas de los archivos anteriores
+            $project->original_file_name = json_encode($originalNames); // Nombres de los archivos anteriores
         }
 
-        session()->flash('status', 'Proyecto actualizado correctamente');
+        // Actualizar otros campos del proyecto
+        $project->name_project = $request->input('name_project');
+        $project->description = $request->input('description');
 
+        // Guardar los cambios
+        $project->save();
+
+        session()->flash('status', 'Proyecto actualizado correctamente');
         return redirect()->route('dashboard');
     }
+
 
     /**
      * Remove the specified resource from storage.
