@@ -56,13 +56,20 @@ class ProjectController extends Controller
         //      'user_id' => 'required',
         //  ]);
 
+        
+        if ($request->hasFile('file')) {
+            // Guardar el archivo en storage/app/public/projects
+            $fileName = $request->file('file')->store('projects', 'public');
+        }
+
         $project = new Project;
         $project->name_project = $request->input('name_project');
         $project->description = $request->input('description');
         $project->file = $request->input('file');
         $project->user_id = Auth::user()->id;
-        //$project->assigned_by = Auth::id(); // Guardar al creador original
+        $project->assigned_by = Auth::id(); // Guardar al creador original
         $project->save();
+
 
         session()->flash('status', 'Proyecto creado correctamente');
 
@@ -97,8 +104,12 @@ class ProjectController extends Controller
         $project->name_project = $request->input('name_project');
         $project->description = $request->input('description');
         $project->file = $request->input('file');
-        $project->user_id = Auth::user()->id;
+        //$project->user_id = Auth::user()->id;
         $project->save();
+
+        if (Auth::id() !== $project->user_id && !$project->users->contains(Auth::id())) {
+            return redirect()->route('dashboard')->with('error', 'No tienes permiso para editar este proyecto.');
+        }
 
         session()->flash('status', 'Proyecto actualizado correctamente');
 
