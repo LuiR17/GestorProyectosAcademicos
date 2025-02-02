@@ -19,7 +19,7 @@
                         <!-- Form title -->
                         <h1 class="text-center text-2xl sm:text-3xl font-bold text-black dark:text-black">Crear Proyecto
                         </h1>
-                        <form action="{{route('projects.store')}}" method="POST">
+                        <form action="{{ route('projects.store') }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             <!-- Input field for 'Name' -->
                             <div class="my-2">
@@ -42,12 +42,13 @@
 
                             <!-- Input field for 'Class' -->
                             <div class="my-2">
-                                <label for="class"
+                                <label for="fileInput"
                                     class="text-sm sm:text-md font-bold text-gray-700 dark:text-black">Archivos</label>
-                                <input type="file" name="file" value="{{ old('file') }}"
-                                    class="block w-full border border-emerald-500 outline-emerald-800 px-2 py-2 text-sm sm:text-md rounded-md my-2 bg-white dark:bg-white text-gray-900 dark:text-black"
-                                    id="class">
+                                <input type="file" name="files[]" value="{{ old('file') }}" multiple id="fileInput"
+                                    class="block w-full border border-emerald-500 outline-emerald-800 px-2 py-2 text-sm sm:text-md rounded-md my-2 bg-white dark:bg-white text-gray-900 dark:text-black">
+                                <div id="filePreview"></div>
                             </div>
+
 
                             <!-- Save button -->
                             <button type="submit"
@@ -67,3 +68,36 @@
 
 
 </x-app-layout>
+
+<script>
+    document.getElementById('fileInput').addEventListener('change', function(e) {
+        var fileList = e.target.files; // Archivos seleccionados
+        var previewContainer = document.getElementById('filePreview');
+        previewContainer.innerHTML = ''; // Limpiar cualquier vista previa previa
+
+        // Recorrer los archivos seleccionados
+        for (var i = 0; i < fileList.length; i++) {
+            var file = fileList[i];
+
+            var fileInfo = document.createElement('p'); // Crear un párrafo para el nombre del archivo
+            fileInfo.textContent = `Archivo: ${file.name} (${file.size} bytes)`; // Mostrar nombre y tamaño
+
+            previewContainer.appendChild(fileInfo); // Agregar el nombre del archivo a la vista previa
+
+            // Si el archivo es una imagen, mostrar una vista previa de la imagen
+            if (file.type.startsWith('image/')) {
+                var imagePreview = document.createElement('img');
+                var reader = new FileReader();
+
+                reader.onload = function(event) {
+                    imagePreview.src = event.target.result;
+                    imagePreview.style.width = '100px'; // Tamaño de la imagen
+                    imagePreview.style.height = '100px';
+                };
+
+                reader.readAsDataURL(file); // Leer el archivo como una URL de datos
+                previewContainer.appendChild(imagePreview); // Agregar la vista previa de la imagen
+            }
+        }
+    });
+</script>

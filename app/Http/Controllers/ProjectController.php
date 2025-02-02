@@ -18,21 +18,21 @@ class ProjectController extends Controller
     public function index()
     {
         $userId = Auth::id(); // Obtener el ID del usuario autenticado
-    
+
         // Proyectos creados por el usuario
         $createdProjects = Project::where('user_id', $userId)->get();
-    
+
         // Proyectos asignados al usuario (a través de la tabla 'participants')
         $assignedProjects = Project::whereHas('users', function ($query) use ($userId) {
             $query->where('user_id', $userId);
         })->get();
-    
+
         // Unimos ambos resultados (sin duplicar proyectos)
         $projects = $createdProjects->merge($assignedProjects)->unique('id');
-    
+
         return view('projects.dashboard', ['projects' => $projects]);
     }
-    
+
 
     /**
      * Show the form for creating a new resource.
@@ -48,33 +48,36 @@ class ProjectController extends Controller
      */
     public function store(Request $request)
     {
+        // Validar que se han subido archivos
+        if ($request->hasFile('files')) {
+            $fileNames = [];
+            $originalNames = [];
 
-        //  $validated = $request->validate([
-        //      'name_project' => 'required',
-        //      'description' => 'required',
-        //      'file' => 'required',
-        //      'user_id' => 'required',
-        //  ]);
+            // Procesar cada archivo cargado
+            foreach ($request->file('files') as $file) {
+                // Generar un nombre único para el archivo
+                $filePath = $file->store('projects', 'public');
 
-        
-        if ($request->hasFile('file')) {
-            // Guardar el archivo en storage/app/public/projects
-            $fileName = $request->file('file')->store('projects', 'public');
+                // Almacenar el nombre original y la ruta
+                $fileNames[] = $filePath;
+                $originalNames[] = $file->getClientOriginalName();
+            }
         }
 
         $project = new Project;
         $project->name_project = $request->input('name_project');
         $project->description = $request->input('description');
-        $project->file = $request->input('file');
+        $project->file = json_encode($fileNames); // Guardar las rutas de los archivos
+        $project->original_file_name = json_encode($originalNames); // Guardar los nombres originales
         $project->user_id = Auth::user()->id;
-        $project->assigned_by = Auth::id(); // Guardar al creador original
         $project->save();
-
 
         session()->flash('status', 'Proyecto creado correctamente');
 
         return redirect()->route('dashboard');
     }
+
+
 
     /**
      * Display the specified resource.
